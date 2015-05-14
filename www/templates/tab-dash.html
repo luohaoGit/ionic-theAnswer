@@ -1,14 +1,31 @@
-<ion-view view-title="Dashboard">
-  <ion-content class="padding">
-    <ion-slide-box on-slide-changed="slideHasChanged($index)">
-      <ion-slide>
-        <div class="box blue"><h1>BLUE</h1></div>
-      </ion-slide>
-      <ion-slide>
-        <div class="box yellow"><h1>YELLOW</h1></div>
-      </ion-slide>
-      <ion-slide>
-        <div class="box pink"><h1>PINK</h1></div>
+<style>
+  .scroll {
+    height: 100%;
+  }
+
+  .slider {
+    height: 100%;
+  }
+  .slider-slide {
+    padding-top: 40px;
+    color: #000;
+    background-color: #fff;
+    text-align: center;
+
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+  }
+
+  .slider-pager-page i{
+  }
+</style>
+
+<ion-view view-title="图片">
+  <ion-content class="padding" scroll="false">
+    <ion-slide-box show-pager="true">
+      <ion-slide ng-repeat="item in data.slides">
+        <h1>{{item.title}}</h1>
+        <img ng-src="{{item.data}}" />
       </ion-slide>
     </ion-slide-box>
   </ion-content>

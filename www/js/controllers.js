@@ -8,10 +8,15 @@ angular.module('starter.controllers', [])
 
   $scope.generateData = function(){
     $scope.data.slides = [];
-    for(var i=1; i<=5; i++){
+    var picUrl = [
+        "http://s3-us-west-2.amazonaws.com/s.cdpn.io/4273/fashion-backless.jpg",
+        "http://s3-us-west-2.amazonaws.com/s.cdpn.io/4273/fashion-front.jpg",
+        "http://s3-us-west-2.amazonaws.com/s.cdpn.io/4273/fashion-pair.jpg"
+    ];
+    for(var i=0; i<picUrl.length; i++){
       var item = {
         title : "Slide " + i,
-        data  : "http://d.hiphotos.baidu.com/zhidao/pic/item/562c11dfa9ec8a13e028c4c0f603918fa0ecc0e4.jpg"
+        data  : picUrl[i]
       }
       $scope.data.slides.push(item);
     }

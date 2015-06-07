@@ -19,28 +19,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleLightContent();
     }
 
-    UDPService.createAndBind(7758).success(function(soid){
-      UDPService.registerReceiveListener(function(data){
-        alert(JSON.stringify(data));
-        var buffer = data.data;
-        var uint8Array = new Uint8Array(buffer);
-        for (var i=0; i<uint8Array.length; i++) {
-          alert(uint8Array[i]);
-        }
-      });
-      UDPService.registerReceiveErrorListener(function(data){
-        alert("error")
-        alert(JSON.stringify(data));
-      });
-      var buffer = new ArrayBuffer(16);
-      var uint8Array = new Uint8Array(buffer);
-      for (var i=0; i<uint8Array.length; i++) {
-        uint8Array[i] = i*2;
-      }
-      UDPService.sendBroadcast(soid, 7758, buffer);
-    }).error(function(){
+    var arr = new Uint8Array(256);
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = i;
+    }
+    var data = arr.buffer;
 
-    });
+
 
   });
 })

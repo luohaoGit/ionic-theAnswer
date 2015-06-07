@@ -2,7 +2,59 @@ angular.module('starter.services', [])
 
     .service('UDPService', function($q) {
 
-      return {
+      var UDPService = function(){
+        this.sockets = []; //0Ω” ’£¨ 1∑¢ÀÕ
+        this.addr = '0.0.0.0';
+        this.broadcastAddr = '255.255.255.255';
+        this.port = 7758;
+
+        this.createSockets(2, function(){
+          this.bindRecv();
+        });
+      }
+
+      UDPService.prototype = {
+        createSocket : function(properties, callback){
+          if (typeof properties == 'function') {
+            callback = properties;
+            properties = {};
+          }
+          chrome.sockets.udp.create(properties, function(createInfo) {
+            this.sockets.push(createInfo);
+            callback();
+          });
+        },
+
+        createSockets : function(count, callback){
+          if (!count)
+            return setTimeout(callback, 0);
+          this.createSocket(this.createSockets.bind(null, count-1, callback));
+        },
+
+        bindRecv : function(){
+          chrome.sockets.udp.bind(this.sockets[0].socketId, this.addr, this.port, function(bindResult) {
+
+          });
+        },
+
+        registerReceiveListener: function(fn){
+          chrome.sockets.udp.onReceive.addListener(fn);
+        },
+
+        registerReceiveErrorListener: function(fn){
+          chrome.sockets.udp.onReceiveError.addListener(fn);
+        },
+
+        sendBroadcast: function(data) {
+          chrome.sockets.udp.send(this.sockets[1].socketId, data, this.broadcastAddr, this.port, function(result) {
+            if (result < 0) {
+              console.log('send fail: ' + result);
+            } else {
+              console.log('sendTo: success ' + port);
+            }
+          });
+        },
+
         createAndBind: function(port) {
           var deferred = $q.defer();
           var promise = deferred.promise;
@@ -24,26 +76,10 @@ angular.module('starter.services', [])
             return promise;
           }
           return promise;
-        },
-
-        registerReceiveListener: function(fn){
-          chrome.sockets.udp.onReceive.addListener(fn);
-        },
-
-        registerReceiveErrorListener: function(fn){
-          chrome.sockets.udp.onReceiveError.addListener(fn);
-        },
-
-        sendBroadcast: function(soid, port, data) {
-            chrome.sockets.udp.send(soid, data, '255.255.255.255', port, function(result) {
-              if (result < 0) {
-                console.log('send fail: ' + result);
-              } else {
-                console.log('sendTo: success ' + port);
-              }
-            });
         }
       }
+
+      return UDPService;
     })
 
     .service('FileService', function($q) {
@@ -61,7 +97,7 @@ angular.module('starter.services', [])
         }, onError);
       };
 
-      FileService.prototype= {
+      FileService.prototype = {
 
         processPackage : function(data){
           var pack = {

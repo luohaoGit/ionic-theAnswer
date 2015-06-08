@@ -1,85 +1,53 @@
 angular.module('starter.services', [])
 
-    .service('UDPService', function($q) {
+    .service('UDPService', function() {
 
-      var UDPService = function(){
-        this.sockets = []; //0接收， 1发送
-        this.addr = '0.0.0.0';
-        this.broadcastAddr = '255.255.255.255';
-        this.port = 7758;
+      var self = this;
+      self.sockets = []; //0接收， 1发送
+      self.addr = '0.0.0.0';
+      self.broadcastAddr = '255.255.255.255';
+      self.port = 7758;
 
-        this.createSockets(2, function(){
-          this.bindRecv();
+      self.init = function(){
+        self.createSockets(2, function(){
+          chrome.sockets.udp.bind(self.sockets[0].socketId, self.addr, self.port, function(bindResult) {});
+          chrome.sockets.udp.bind(self.sockets[1].socketId, self.addr, self.port, function(bindResult) {});
         });
       }
 
-      UDPService.prototype = {
-        createSocket : function(properties, callback){
-          if (typeof properties == 'function') {
-            callback = properties;
-            properties = {};
-          }
-          chrome.sockets.udp.create(properties, function(createInfo) {
-            this.sockets.push(createInfo);
-            callback();
-          });
-        },
+      self.createSocket = function(properties, callback){
+        if (typeof properties == 'function') {
+          callback = properties;
+          properties = {};
+        }
+        chrome.sockets.udp.create(properties, function(createInfo) {
+          self.sockets.push(createInfo);
+          callback();
+        });
+      }
 
-        createSockets : function(count, callback){
-          if (!count)
-            return setTimeout(callback, 0);
-          this.createSocket(this.createSockets.bind(null, count-1, callback));
-        },
+      self.createSockets = function(count, callback){
+        if (!count)
+          return setTimeout(callback, 0);
+        self.createSocket(self.createSockets.bind(null, count-1, callback));
+      }
 
-        bindRecv : function(){
-          chrome.sockets.udp.bind(this.sockets[0].socketId, this.addr, this.port, function(bindResult) {
-
-          });
-        },
-
-        registerReceiveListener: function(fn){
-          chrome.sockets.udp.onReceive.addListener(fn);
-        },
-
-        registerReceiveErrorListener: function(fn){
-          chrome.sockets.udp.onReceiveError.addListener(fn);
-        },
-
-        sendBroadcast: function(data) {
-          chrome.sockets.udp.send(this.sockets[1].socketId, data, this.broadcastAddr, this.port, function(result) {
-            if (result < 0) {
-              console.log('send fail: ' + result);
-            } else {
-              console.log('sendTo: success ' + port);
-            }
-          });
-        },
-
-        createAndBind: function(port) {
-          var deferred = $q.defer();
-          var promise = deferred.promise;
-
-          chrome.sockets.udp.create(function(createInfo) {
-            chrome.sockets.udp.bind(createInfo.socketId, '0.0.0.0', port, function(result) {
-              deferred.resolve(createInfo.socketId);
-            }, function(){
-              deferred.reject();
-            });
-          });
-
-          promise.success = function(fn) {
-            promise.then(fn);
-            return promise;
-          }
-          promise.error = function(fn) {
-            promise.then(null, fn);
-            return promise;
-          }
-          return promise;
+      self.registerReceiveListener = function(fn, error){
+        chrome.sockets.udp.onReceive.addListener(fn);
+        if (typeof error == 'function') {
+          chrome.sockets.udp.onReceiveError.addListener(error);
         }
       }
 
-      return UDPService;
+      self.sendBroadcast = function(data) {
+        chrome.sockets.udp.send(self.sockets[1].socketId, data, self.broadcastAddr, self.port, function(result) {
+          if (result < 0) {
+            console.log('send fail: ' + result);
+          } else {
+            console.log('sendTo: success ' + port);
+          }
+        });
+      }
     })
 
     .service('FileService', function($q) {

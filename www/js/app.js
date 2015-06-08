@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, UDPService, FileService) {
+.run(function($ionicPlatform, UDPService, FileService, $timeout) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,13 +19,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleLightContent();
     }
 
-    var arr = new Uint8Array(256);
-    for (var i = 0; i < arr.length; i++) {
-      arr[i] = i;
-    }
+    var arr = new Uint8Array(2);
+      arr[0] = 97;
+      arr[1] = 98;
     var data = arr.buffer;
+    UDPService.init();
+    UDPService.registerReceiveListener(function(info){
+      alert(JSON.stringify(info));
+    }, function(error){
+      alert(JSON.stringify(error))
+    });
 
-
+    $timeout(function(){
+      UDPService.sendBroadcast(data)
+    }, 3000);
 
   });
 })

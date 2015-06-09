@@ -25,6 +25,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     var data = arr.buffer;
     UDPService.init();
     UDPService.registerReceiveListener(function(info){
+      if(info.socketId == 0)
       alert(JSON.stringify(info));
     }, function(error){
       alert(JSON.stringify(error))

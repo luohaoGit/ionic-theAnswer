@@ -19,21 +19,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleLightContent();
     }
 
-    var arr = new Uint8Array(2);
-      arr[0] = 97;
-      arr[1] = 98;
-    var data = arr.buffer;
     UDPService.init();
+    FileService.init();
     UDPService.registerReceiveListener(function(info){
-      if(info.socketId == 0)
-      alert(JSON.stringify(info));
-    }, function(error){
-      alert(JSON.stringify(error))
+      if(info.socketId == 0){
+        alert(JSON.stringify(info));
+        FileService.writeFile("helloworld", 0, info.data, true);
+      }
     });
-
-    $timeout(function(){
-      UDPService.sendBroadcast(data)
-    }, 3000);
 
   });
 })

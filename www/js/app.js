@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, UDPService, FileService, $timeout) {
+.run(function($ionicPlatform, UDPService, FileService, $timeout, $rootScope) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,12 +19,33 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleLightContent();
     }
 
+    $rootScope.files = {};
     UDPService.init();
     FileService.init();
     UDPService.registerReceiveListener(function(info){
       if(info.socketId == 0){
         alert(JSON.stringify(info));
-        FileService.writeFile("helloworld", 0, info.data, true);
+        var size = UDPService.packageLength;
+        if(!$rootScope.files[info.id]){
+          var file = {};
+          file.id = info.id;
+          file.positions = {};
+          var packageCount = (file.length / size) + ((file.length % size) > 0 ? 1 : 0);
+          for(var i=0; i<packageCount; i++){
+            file.positions[i*size + 1] = 0;
+          }
+          $rootScope.files[info.id] = file;
+        }
+
+        var checkPos = function(id, position){
+          delete $rootScope.files[id].positions[position];
+          if(Object.getOwnPropertyNames($rootScope.files[id].positions).length == 0){
+            delete $rootScope.files[id];
+            alert("½ÓÊÜÍê±Ï");
+          }
+        }
+
+        FileService.writeFile("img" + info.id, info.position, info.data, checkPos(info.id, info.position));
       }
     });
 

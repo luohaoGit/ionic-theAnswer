@@ -72,15 +72,13 @@ angular.module('starter.services', [])
         }, success, error);
       }
 
-      self.writeFile = function(fileName, position, data, lastPackage){
+      self.writeFile = function(fileName, position, data, onwriteend){
         // creates file, then write content
         self.createFile(fileName, function (fileEntry) {
           // writes file content
           fileEntry.createWriter(function (writer) {
             var verifier = function () {
-              if(lastPackage){
-                alert(self.root.toURL() + '/' + fileName)
-              }
+              onwriteend && onwriteend();
             };
             //Write process
             writer.onwriteend = verifier;

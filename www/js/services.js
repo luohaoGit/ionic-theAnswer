@@ -60,10 +60,29 @@ angular.module('starter.services', [])
       var self = this;
 
       self.init = function(){
-        self.packageLength = 1024 * 50 -11;
+        self.packageLength = 1470 - 11;
         window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fileSystem) {
           self.root = fileSystem.root;
         }, onError);
+      }
+
+      self.processPackage = function(buffer){
+        var dv = new DataView(buffer);alert(dv)
+        var type = dv.getInt8(0);alert(type)
+        var id = dv.getInt8(1),
+            pos = dv.getInt8(2),
+            len = dv.getFloat64(3),
+            data = buffer.subarray(11, buffer.length);
+
+        //alert(type + "-" + id + "-" + pos + "-" + len)
+
+        return {
+          type : type,
+          id : id,
+          pos : pos,
+          len : len,
+          data : data
+        }
       }
 
       self.createFile = function(fileName, success, error){

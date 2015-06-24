@@ -57,24 +57,43 @@ angular.module('starter.services', [])
         console.log(JSON.stringify(e));
       };
 
+      var toBin = function(num) {
+        var bits = [];
+        var binstr = parseInt(num,10).toString(2);
+        var zore = "0";
+        if(binstr.length < 8){
+          for(var i=0; i<8-binstr.length; i++){
+            binstr = zore + binstr;
+          }
+        }
+        bits.push(binstr);
+        return bits;
+      }
+
       var self = this;
 
+      self.getPackageLength = function(){
+        return (1470 - 11);
+      }
+
       self.init = function(){
-        self.packageLength = 1470 - 11;
         window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fileSystem) {
           self.root = fileSystem.root;
         }, onError);
       }
 
       self.processPackage = function(buffer){
-        var dv = new DataView(buffer);alert(dv)
-        var type = dv.getInt8(0);alert(type)
-        var id = dv.getInt8(1),
-            pos = dv.getInt8(2),
-            len = dv.getFloat64(3),
-            data = buffer.subarray(11, buffer.length);
+        var data = buffer.slice(11, buffer.byteLength);
+        var dv = new DataView(buffer.slice(0, 11));
+        var type = dv.getUint8(0), id = dv.getUint8(1), pos = dv.getUint8(2);//, len = buffer.slice(3, 11);
 
-        //alert(type + "-" + id + "-" + pos + "-" + len)
+        var len16 = "";
+        for(var i=0; i<8; i++){
+          var t = dv.getUint8(3+i);
+          len16 = parseInt(t).toString(16) + len16;
+        }
+
+        var len = parseInt(len16, 16);
 
         return {
           type : type,

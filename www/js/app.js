@@ -25,28 +25,29 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     UDPService.registerReceiveListener(function(info){
       if(info.socketId == 0){
         var dataInfo = FileService.processPackage(info.data);
-        var size = UDPService.packageLength;
+        var size = FileService.getPackageLength();
         if(!$rootScope.files[dataInfo.id]){
           var file = {};
           file.id = dataInfo.id;
-          file.length = dataInfo.len;
+          file.len = dataInfo.len;
           file.positions = {};
-          var packageCount = (file.length / size) + ((file.length % size) > 0 ? 1 : 0);
+          var packageCount = parseInt(file.len / size) + ((file.len % size) > 0 ? 1 : 0);
           for(var i=0; i<packageCount; i++){
-            file.positions[i*size + 1] = 0;
+            file.positions[i*size] = 0;
           }
           $rootScope.files[dataInfo.id] = file;
         }
 
         var checkPos = function(id, position){
+          alert(id + "--" + position)
           delete $rootScope.files[id].positions[position];
           if(Object.getOwnPropertyNames($rootScope.files[id].positions).length == 0){
             delete $rootScope.files[id];
-            //alert("接受完毕");
+            alert("接收完毕");
           }
         }
 
-        FileService.writeFile("img" + dataInfo.id + ".png", dataInfo.position, dataInfo.data, checkPos(dataInfo.id, dataInfo.position));
+        FileService.writeFile("img" + dataInfo.id + ".png", dataInfo.pos, dataInfo.data, checkPos(dataInfo.id, dataInfo.pos));
       }
     });
 

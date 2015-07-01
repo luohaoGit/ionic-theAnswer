@@ -19,37 +19,49 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleLightContent();
     }
 
-    $rootScope.files = {};
-    UDPService.init();
-    FileService.init();
-    UDPService.registerReceiveListener(function(info){
-      if(info.socketId == 0){
-        var dataInfo = FileService.processPackage(info.data);
-        var size = FileService.getPackageLength();
-        if(!$rootScope.files[dataInfo.id]){
-          var file = {};
-          file.id = dataInfo.id;
-          file.len = dataInfo.len;
-          file.positions = {};
-          var packageCount = parseInt(file.len / size) + ((file.len % size) > 0 ? 1 : 0);
-          for(var i=0; i<packageCount; i++){
-            file.positions[i*size] = 0;
-          }
-          $rootScope.files[dataInfo.id] = file;
-        }
+      /*    $rootScope.files = {};
+       UDPService.init();
+       FileService.init();
+       UDPService.registerReceiveListener(function(info){
+       if(info.socketId == 0){
+       var dataInfo = FileService.processPackage(info.data);
+       var size = FileService.getPackageLength();
+       if(!$rootScope.files[dataInfo.id]){
+       var file = {};
+       file.id = dataInfo.id;
+       file.len = dataInfo.len;
+       file.positions = {};
+       var packageCount = parseInt(file.len / size) + ((file.len % size) > 0 ? 1 : 0);
+       for(var i=0; i<packageCount; i++){
+       file.positions[i*size] = 0;
+       }
+       $rootScope.files[dataInfo.id] = file;
+       }
 
-        var checkPos = function(id, position){
-          alert(id + "--" + position)
-          delete $rootScope.files[id].positions[position];
-          if(Object.getOwnPropertyNames($rootScope.files[id].positions).length == 0){
-            delete $rootScope.files[id];
-            alert("接收完毕");
-          }
-        }
+       var checkPos = function(id, position){
+       alert(id + "--" + position)
+       delete $rootScope.files[id].positions[position];
+       if(Object.getOwnPropertyNames($rootScope.files[id].positions).length == 0){
+       delete $rootScope.files[id];
+       alert("接收完毕");
+       }
+       }
 
-        FileService.writeFile("img" + dataInfo.id + ".png", dataInfo.pos, dataInfo.data, checkPos(dataInfo.id, dataInfo.pos));
-      }
-    });
+       FileService.writeFile("img" + dataInfo.id + ".png", dataInfo.pos, dataInfo.data, checkPos(dataInfo.id, dataInfo.pos));
+       }
+       });*/
+
+    navigator.startApp.check("com.yun.teacher", function(message) {
+        navigator.startApp.start("com.yun.teacher", function(message) {
+                console.log(message); // => OK
+            },
+            function(error) {
+                alert(JSON.stringify(error));
+            });
+      },
+      function(error) {
+          alert(JSON.stringify(error));
+      });
 
   });
 })
